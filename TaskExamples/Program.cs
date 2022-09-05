@@ -28,7 +28,7 @@ namespace TaskExamples
             //var data = await myTask;
             //Console.WriteLine("data uzunluk:" + data.Length);
 
-            Console.WriteLine("Main thread:" + Thread.CurrentThread.ManagedThreadId);
+            Console.WriteLine("Main thread1:" + Thread.CurrentThread.ManagedThreadId);
 
             List<string> urlList = new List<string>()
             {
@@ -45,28 +45,9 @@ namespace TaskExamples
                 taskList.Add(GetContentAsync(x));
             });
 
-            //var contents = await Task.WhenAll(taskList.ToArray());
-            //contents.ToList().ForEach(x =>
-            //{
-            //    Console.WriteLine($"{x.Site} boyut:{x.Length}");
-            //});
-
-            //contents.ToList().ForEach(x =>
-            //{
-            //    Console.WriteLine($"{x.Site} boyut:{x.Length}");
-            //});
-
-            var contents = Task.WhenAll(taskList.ToArray());
-
-            Console.WriteLine("Aradaki işler yapılabilir.");
-            Console.WriteLine("WhenAll methodtan sonra başka işler yaptım");
-
-            var data = await contents;
-           
-            data.ToList().ForEach(x =>
-            {
-                Console.WriteLine($"{x.Site} boyut:{x.Length}");
-            });
+            var firstData = await Task.WhenAny(taskList);
+            Console.WriteLine($"{firstData.Result.Site} - {firstData.Result.Length} ");
+            Console.WriteLine("Main thread2:" + Thread.CurrentThread.ManagedThreadId);
         }
 
         public static async Task<Content> GetContentAsync(string url)
