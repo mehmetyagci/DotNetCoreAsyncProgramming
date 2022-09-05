@@ -2,9 +2,15 @@
 
 namespace TaskExamples
 {
-    class Program
+    public class Content
     {
-        static async Task Main(string[] args)
+        public string Site { get; set; }
+        public int Length { get; set; } = 0;
+    }
+
+    internal class Program
+    {
+        private async static Task Main(string[] args)
         {
 
             // var myTask = new HttpClient().GetStringAsync("https://www.google.com").ContinueWith
@@ -22,20 +28,58 @@ namespace TaskExamples
             //var data = await myTask;
             //Console.WriteLine("data uzunluk:" + data.Length);
 
-            Console.WriteLine("Hello World!");
+            Console.WriteLine("Main thread:" + Thread.CurrentThread.ManagedThreadId);
 
-            var myTask = new HttpClient().GetStringAsync("https://www.google.com")
-                .ContinueWith(calis);
+            List<string> urlList = new List<string>()
+            {
+                "https://www.google.com",
+                "https://www.microsoft.com",
+                "https://www.amazon.com",
+                "https://www.n11.com",
+                "https://www.haberturk.com"
+            };
 
-            Console.WriteLine("Arada yapılacak işler");
+            List<Task<Content>> taskList = new List<Task<Content>>();
+            urlList.ToList().ForEach(x =>
+            {
+                taskList.Add(GetContentAsync(x));
+            });
 
-            await myTask;
+            //var contents = await Task.WhenAll(taskList.ToArray());
+            //contents.ToList().ForEach(x =>
+            //{
+            //    Console.WriteLine($"{x.Site} boyut:{x.Length}");
+            //});
+
+            //contents.ToList().ForEach(x =>
+            //{
+            //    Console.WriteLine($"{x.Site} boyut:{x.Length}");
+            //});
+
+            var contents = Task.WhenAll(taskList.ToArray());
+
+            Console.WriteLine("Aradaki işler yapılabilir.");
+            Console.WriteLine("WhenAll methodtan sonra başka işler yaptım");
+
+            var data = await contents;
+           
+            data.ToList().ForEach(x =>
+            {
+                Console.WriteLine($"{x.Site} boyut:{x.Length}");
+            });
         }
 
-        private static void calis(Task<string> data)
+        public static async Task<Content> GetContentAsync(string url)
         {
-            Console.WriteLine("data uzunluk:" + data.Result.Length);
-            /// 100 satırlık kod burada
+            Content content = new Content();
+            var data = await new HttpClient().GetStringAsync(url);
+
+            content.Site = url;
+            content.Length = data.Length;
+            Console.WriteLine("url:" + url + " GetContentAsync thread:" + Thread.CurrentThread.ManagedThreadId);
+
+            return content;
         }
+
     } // end of class
 } // end of namespace
