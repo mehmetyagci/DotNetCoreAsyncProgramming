@@ -12,7 +12,6 @@ namespace TaskExamples
     {
         private async static Task Main(string[] args)
         {
-
             // var myTask = new HttpClient().GetStringAsync("https://www.google.com").ContinueWith
             //  ((data) =>
             //{
@@ -45,8 +44,15 @@ namespace TaskExamples
                 taskList.Add(GetContentAsync(x));
             });
 
-            var firstData = await Task.WhenAny(taskList);
-            Console.WriteLine($"{firstData.Result.Site} - {firstData.Result.Length} ");
+            Console.WriteLine("Wait All methodundan önce");
+            bool tamamlandimi = Task.WaitAll(taskList.ToArray(), 300);
+            Console.WriteLine("Wait All methodundan sonra");
+
+            Console.WriteLine("3 saniyede sonuc geldi mi?" +tamamlandimi);
+
+
+            Console.WriteLine($"{taskList.First().Result.Site} -  {taskList.First().Result.Length}");
+
             Console.WriteLine("Main thread2:" + Thread.CurrentThread.ManagedThreadId);
         }
 
