@@ -44,14 +44,11 @@ namespace TaskExamples
                 taskList.Add(GetContentAsync(x));
             });
 
-            Console.WriteLine("Wait All methodundan önce");
-            bool tamamlandimi = Task.WaitAll(taskList.ToArray(), 300);
-            Console.WriteLine("Wait All methodundan sonra");
+            Console.WriteLine("Wait Any methodundan önce");
+            var firstTaskIndex = Task.WaitAny(taskList.ToArray());
+            Console.WriteLine("Wait Any methodundan sonra");
 
-            Console.WriteLine("3 saniyede sonuc geldi mi?" +tamamlandimi);
-
-
-            Console.WriteLine($"{taskList.First().Result.Site} -  {taskList.First().Result.Length}");
+            Console.WriteLine($"{taskList[firstTaskIndex].Result.Site} -  {taskList[firstTaskIndex].Result.Length}");
 
             Console.WriteLine("Main thread2:" + Thread.CurrentThread.ManagedThreadId);
         }
